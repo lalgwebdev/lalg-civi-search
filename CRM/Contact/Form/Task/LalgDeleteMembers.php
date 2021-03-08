@@ -111,26 +111,22 @@ class CRM_Contact_Form_Task_LalgDeleteMembers extends CRM_Contact_Form_Task_Dele
 		}
 
 		else {
-			// Block Drupal Account
-			try {
+			// Delete Drupal Account
 				$result = civicrm_api3('User', 'get', [
 				  'sequential' => 1,
 				  'contact_id' => $cid,
 				]);
-//				dpm($result);
 				$userId = $result['values'][0]['id'];
 				if ($userId) {
-					$empty = NULL;
-					user_block_user_action($empty , array('uid' => $userId));		// First param must be a variable
+					$user = \Drupal\user\Entity\User::load($userId); // get the User Entity
+					if ($user) {
+						$user->delete();
+					}
 				}
 			}
-			catch (Exception $e) {
-				// Throws error if no User, so ignore it
-			}
 		}
+		parent::postProcess();
 	}
-	parent::postProcess();
-  }
 
 }
 
