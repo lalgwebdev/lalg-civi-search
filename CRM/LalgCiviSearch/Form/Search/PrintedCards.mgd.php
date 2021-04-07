@@ -12,7 +12,7 @@ return array (
     array (
       'version' => 3,
       'label' => 'PrintedCards',
-      'description' => 'PrintedCards (lalgutils)',
+      'description' => 'PrintedCards (LalgCiviSearch)',
       'class_name' => 'CRM_LalgCiviSearch_Form_Search_PrintedCards',
     ),
   ),
