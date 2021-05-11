@@ -12,9 +12,9 @@ class CRM_LalgCiviSearch_Upgrader extends CRM_LalgCiviSearch_Upgrader_Base {
   /**
    * Example: Run an external SQL script when the module is installed.
    */
-  public function install() {
-    $this->executeSqlFile('sql/myinstall.sql');
-  }
+//  public function install() {
+//    $this->executeSqlFile('sql/myinstall.sql');
+//  }
 
   /**
    * Example: Work with entities usually not available during the install step.
@@ -37,9 +37,9 @@ class CRM_LalgCiviSearch_Upgrader extends CRM_LalgCiviSearch_Upgrader_Base {
   /**
    * Example: Run an external SQL script when the module is uninstalled.
    */
-  public function uninstall() {
-   $this->executeSqlFile('sql/myuninstall.sql');
-  }
+//  public function uninstall() {
+//   $this->executeSqlFile('sql/myuninstall.sql');
+//  }
 
   /**
    * Example: Run a simple query when a module is enabled.
