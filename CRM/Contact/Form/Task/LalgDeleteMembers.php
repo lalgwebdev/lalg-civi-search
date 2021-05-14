@@ -112,6 +112,7 @@ class CRM_Contact_Form_Task_LalgDeleteMembers extends CRM_Contact_Form_Task_Dele
 
 		else {
 			// Delete Drupal Account
+			try {
 				$result = civicrm_api3('User', 'get', [
 				  'sequential' => 1,
 				  'contact_id' => $cid,
@@ -124,10 +125,14 @@ class CRM_Contact_Form_Task_LalgDeleteMembers extends CRM_Contact_Form_Task_Dele
 					}
 				}
 			}
+			catch (Exception $e) {
+				// Throws error if no User, so ignore it
+				//dpm($e);
+			}
 		}
 		parent::postProcess();
 	}
-
+  }
 }
 
 
