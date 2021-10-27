@@ -7,7 +7,7 @@ class CRM_LalgCiviSearch {
    * @param  mixed $cids Contact IDS - Array or comma seperated integers
    * Note - these are the ids of people, not the households.
    */
-  public function clear_print_flag($cids) {
+  public static function clear_print_flag($cids) {
     if (!is_array($cids)) {
       $cids = explode(",", $cids);
     }
