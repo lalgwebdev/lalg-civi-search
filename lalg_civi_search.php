@@ -182,6 +182,10 @@ function lalg_civi_search_civicrm_searchTasks($objectName, &$tasks) {
       'class' => 'CRM_Contact_Form_Task_LalgPrintLabels'
     ];
     $tasks[] = [
+      'title' => 'LALG - Export CSV Addresses',
+      'class' => ['CRM_Contact_Export_Form_LalgSelect', 'CRM_Contact_Export_Form_LalgMap']
+    ];
+    $tasks[] = [
       'title' => 'LALG - Delete Members',
       'class' => 'CRM_Contact_Form_Task_LalgDeleteMembers'
     ];
@@ -198,6 +202,9 @@ function lalg_civi_search_civicrm_buildForm($formName, &$form) {
 	  }
 	  if ($formName == "CRM_Contact_Form_Task_LalgPrintLabels") {
 		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/printlabels.js');
+	  }  
+	  if ($formName == "CRM_Contact_Export_Form_LalgSelect") {
+		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/exportCSV.js');
 	  }  
 	  if (strpos($_SERVER['REQUEST_URI'], "lalgwf=2" ) !== false) {
 		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/searchlabels.js');
