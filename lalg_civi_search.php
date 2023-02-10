@@ -193,6 +193,22 @@ function lalg_civi_search_civicrm_searchTasks($objectName, &$tasks) {
 }
 
 /**
+ * Implements hook_civicrm_searchKitTasks().
+ *
+ * @param array[] $tasks
+ * @param bool $checkPermissions
+ * @param int|null $userID
+ */
+function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
+  $tasks['Contact']['testSK'] = [
+    'module' => 'testTasks',
+    'title' => E::ts('Test Task'),
+    'icon' => 'fa-random',
+    'uiDialog' => ['templateUrl' => '~/lalg-civi-search/html/testTssk.html'],
+  ];
+}
+
+/**
  * Implements hook_civicrm_buildForm().
  * Adds js to our form
  */
