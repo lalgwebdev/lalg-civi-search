@@ -200,11 +200,11 @@ function lalg_civi_search_civicrm_searchTasks($objectName, &$tasks) {
  * @param int|null $userID
  */
 function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
-  $tasks['Contact']['testSK'] = [
-    'module' => 'testTasks',
-    'title' => E::ts('Test Task'),
+  $tasks['Contact']['lalgDelateMembers'] = [
+    'module' => 'lalgSearchTasks',
+    'title' => E::ts('LALG Delete Members'),
     'icon' => 'fa-random',
-    'uiDialog' => ['templateUrl' => '~/lalg-civi-search/html/testTssk.html'],
+    'uiDialog' => ['templateUrl' => '~/lalgSearchTasks/lalgDeleteMembers.html'],
   ];
 }
 

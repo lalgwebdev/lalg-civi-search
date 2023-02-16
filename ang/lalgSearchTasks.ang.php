@@ -4,21 +4,20 @@
 // \https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules/n
 return [
   'js' => [
-    'ang/testTask.js',
-    'ang/testTask/*.js',
-    'ang/testTask/*/*.js',
+    'ang/lalgSearchTasks.js',
+    'ang/lalgSearchTasks/*.js',
+    'ang/lalgSearchTasks/*/*.js',
   ],
   'css' => [
-    'ang/testTask.css',
+    'css/lalgSearchTasks.css',
   ],
   'partials' => [
-    'ang/testTask',
+    'ang/lalgSearchTasks',
   ],
   'requires' => [
     'crmUi',
     'crmUtil',
     'ngRoute',
-	'api4',
   ],
   'settings' => [],
 ];
