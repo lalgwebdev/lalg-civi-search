@@ -32,9 +32,8 @@ console.log('Entering Controller');
           }, 1000);	  
 
     };
-
-
-
+	
+	
     $scope.details = 'Details in $scope.details';
 	ctrl.details = 'Details in ctrl.details';
 	
@@ -44,5 +43,20 @@ console.log(this);
 	  
 
   });
+  
+  angular.module('lalgSearchTasks').directive('lalgDialogButton', LalgDialogButton);
+
+  function LalgDialogButton() {
+    var ddo = {
+	  restrict: 'E',
+      templateUrl: 'lalgDialogButton.html',
+      scope: {
+		text: '@text',
+		icon: '@icon',
+		onClick: '@onClick'
+      }
+    };
+    return ddo;
+  }
 
 })(angular, CRM.$, CRM._);
