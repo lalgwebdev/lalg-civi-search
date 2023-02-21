@@ -193,6 +193,35 @@ function lalg_civi_search_civicrm_searchTasks($objectName, &$tasks) {
 }
 
 /**
+ * Implements hook_civicrm_searchKitTasks().
+ *
+ * @param array[] $tasks
+ * @param bool $checkPermissions
+ * @param int|null $userID
+ */
+function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
+  // $tasks['Contact']['lalgDelateMembers'] = [
+    // 'module' => 'lalgSearchTasks',
+    // 'title' => E::ts('LALG Delete Members'),
+    // 'icon' => 'fa-random',
+    // 'uiDialog' => ['templateUrl' => '~/lalgSearchTasks/lalgDeleteMembers.html'],
+  // ];
+  
+  $tasks['Contact']['lalgDelateMembers'] = [
+    'title' => E::ts('LALG Delete Members'),
+    'icon' => 'fa-trash',
+    'apiBatch' => [
+      'action' => 'lalgDeleteMember', 						// Name of API action to call once per row
+      'params' => NULL, 							// Optional array of additional api params
+      'confirmMsg' => E::ts('Are you sure you want to delete %1 %2?'), // If omitted, the action will run immediately with no confirmation
+      'runMsg' => E::ts('Deleting %1 %2...'),
+      'successMsg' => E::ts('Successfully deleted %1 %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
+    ],
+  ];
+}
+
+/**
  * Implements hook_civicrm_buildForm().
  * Adds js to our form
  */

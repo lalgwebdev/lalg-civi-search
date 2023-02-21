@@ -15,37 +15,52 @@ use Civi\Api4\Generic\Result;
 class LalgDeleteMember extends \Civi\Api4\Generic\AbstractAction {
 	
   /**
-   * Id of the Contact to be deleted..
+   * Where clause for a further API call, with Id of the Contact to be deleted..
+   *   .. because this is the way that Searck Kit apiBatch facility delivers the Id.
+   *
+   * We define this parameter just by declaring this variable. It will appear in the _API Explorer_,
+   * and a getter/setter are magically provided: `$this->setXxxx()` and `$this->getXxxx()`.
+   */
+  protected $where = [["id","IN",["<id>"]]];
+  
+  /**
+   * Id for a simple, single, Contact Id.  API Explorer uses this.
    *
    * We define this parameter just by declaring this variable. It will appear in the _API Explorer_,
    * and a getter/setter are magically provided: `$this->setXxxx()` and `$this->getXxxx()`.
    *
-   * @required
    * @var int
    */
-  protected $contactId ;
-
+  protected $contactId; 
+  
   /**
    * Every action must define a _run function to perform the work and place results in the Result object.
    *
-   * @param $this->contactId
+   * @param $this->where 
    * @param Result $result
    */
   public function _run(Result $result) {
-	  
-dpm($this);
-	  
+// dpm($this);
+    // Construct the Where clause depending on the parameter(s) given.
+    if (isset($this->contactId)) {
+	  $myWhere = [['id', 'IN', [$this->contactId]]];
+	}
+	elseif (isset($this->where)) {
+	  $myWhere = $this->where;
+	}
+	else {
+	  throw new Exception('No valid Id parameter detected');
+	}
+		
     $dname = civicrm_api4('Contact', 'get', [
       'select' => ['display_name'],
-      'where' => [
-        ['id', '=', $this->contactId],
-      ],
+      'where' => $myWhere,
     ]);
-//	$result[0] = $dname[0]['display_name'];
+// dpm($dname);
 	
-	  $result[] = [
-        'name' => 'Name of input Id:  ' . $dname[0]['display_name'],
-      ];
+    $result[] = [
+      'name' => 'Name of input Id:  ' . $dname[0]['display_name'],
+    ];
   }
 
   /**
