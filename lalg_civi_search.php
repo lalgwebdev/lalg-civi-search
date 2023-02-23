@@ -206,12 +206,15 @@ function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermi
     // 'icon' => 'fa-random',
     // 'uiDialog' => ['templateUrl' => '~/lalgSearchTasks/lalgDeleteMembers.html'],
   // ];
-  
-  $tasks['Contact']['lalgDelateMembers'] = [
+
+// Registers the Action to Delete/Cancel Members and Memberships.  
+// Specified for use in Search Kit apiBatch facility.
+// The documentation says it is called once per row, but actually is called with an array of Ids.
+  $tasks['Contact']['lalgDeleteMembers'] = [
     'title' => E::ts('LALG Delete Members'),
     'icon' => 'fa-trash',
     'apiBatch' => [
-      'action' => 'lalgDeleteMember', 						// Name of API action to call once per row
+      'action' => 'lalgDeleteMembers', 				// Name of API action to call [once per row]
       'params' => NULL, 							// Optional array of additional api params
       'confirmMsg' => E::ts('Are you sure you want to delete %1 %2?'), // If omitted, the action will run immediately with no confirmation
       'runMsg' => E::ts('Deleting %1 %2...'),
