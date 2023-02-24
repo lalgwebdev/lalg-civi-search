@@ -62,101 +62,101 @@ dpm($this);
 	}
 dpm($_contactIds);
 
+
 /**
-  *  For each Household on the list 
-  *    add any members not already on it.  
+  *  Process additional actions for all Contacts 
   */
 	foreach ($_contactIds as $cid) {
-		//Check if is Household
+	// Get Contact Type
 		$cType = \Civi\Api4\Contact::get()
 		->addSelect('contact_type')
 		->addWhere('id', '=', $cid)
 		->execute()
 		->first()['contact_type'];
+dpm($cType);
 
-		if ($cType !== 'Household') { break; } 
+	//Split on Contact Type
+	//  Do HOUSEHOLD tidy ups
+		if ($cType == 'Household') {  
+/**
+  *  For each Household on the list 
+  *    add any members not already on it.  
+  */
+	dpm('Getting Relationships');		
+			$relns = \Civi\Api4\Relationship::get()
+				->addSelect('contact_id_a')
+				->addWhere('contact_id_b', '=', $cid)
+				->addWhere('contact_id_a.is_deleted', '=', FALSE)
+				->execute();
+	dpm($relns);		
+			// For each Relationship
+			foreach ($relns as $reln) {
+				// Get related Individual
+				$memberId = $reln['contact_id_a'];
+				// If not on the list, then add.
+				if (!in_array($memberId, $_contactIds)) {
+	dpm ('Adding Individual: ' . $memberId);
+					$_contactIds[] = (int)$memberId;
+				}
+			}
+		}
 
-dpm('Getting Relationships');		
-		$relns = \Civi\Api4\Relationship::get()
-			->addSelect('contact_id_a')
-			->addWhere('contact_id_b', '=', $cid)
-			->addWhere('contact_id_a.is_deleted', '=', FALSE)
-			->execute();
-dpm($relns);		
+		else {
+/**
+ *  For each Individual on the list 
+ *     check if their Household will be empty  
+ */
+			// Get related Household
+			$hhId = \Civi\Api4\Relationship::get()
+			->addSelect('contact_id_b')
+			->addWhere('contact_id_a', '=', $cid)
+			->execute()
+			->first()['contact_id_b'];
 
-		// For each Relationship
-		foreach ($relns as $reln) {
-			// Get related Individual
-			$memberId = $reln['contact_id_a'];
-			// If not on the list, then add.
-			if (!in_array($memberId, $_contactIds)) {
-dpm ('Adding Individual: ' . $memberId);
-				$_contactIds[] = (int)$memberId;
+			// If HH does not exist, or already on the list GOTO next Individual
+			if (!$hhId || in_array($hhId, $_contactIds)) { break;}
+			
+			// Else For each Relationship
+			$relns = \Civi\Api4\Relationship::get()
+				->addSelect('contact_id_a')
+				->addWhere('contact_id_b', '=', $hhId)
+				->execute();		
+	dpm($relns);
+			
+			$addHH = TRUE;						// Default assumption - add HH to list
+			foreach ($relns as $reln) {
+				// Get related Individual
+				$memberId = $reln['contact_id_a'];
+	dpm('Loop 2 : ' . $memberId);
+				// If related Individual not on the list GoTo next Relationship
+				if (!in_array($memberId, $_contactIds)) { $addHH = FALSE; break; } // Found reason not to delete the Household 
+			}	
+			if ($addHH) {
+			// (All members are on the list) so add HH to list
+	dpm('Adding Household: ' . $hhId);
+				$_contactIds[] = (int)$hhId;
 			}
 		}
 	}
 dpm($_contactIds);
 
-/**
- *  For each Individual on the list 
- *     check if their Household will be empty  
- */
-	foreach ($_contactIds as $cid) {
-dpm('Loop 1 : ' . $cid);
-		// Check if is Individual
-		$cType = \Civi\Api4\Contact::get()
-		->addSelect('contact_type')
-		->addWhere('id', '=', $cid)
-		->execute()
-		->first()['contact_type'];
-
-		if ($cType !== 'Individual') { break; } 
-		
-		// Get related Household
-		$hhId = \Civi\Api4\Relationship::get()
-		->addSelect('contact_id_b')
-		->addWhere('contact_id_a', '=', $cid)
-		->execute()
-		->first()['contact_id_b'];
-
-		// If HH on the list GOTO next Individual
-		if (in_array($hhId, $_contactIds)) { break;}
-		
-		// Else For each Relationship
-		$relns = \Civi\Api4\Relationship::get()
-            ->addSelect('contact_id_a')
-			->addWhere('contact_id_b', '=', $hhId)
-			->execute();		
-dpm($relns);
-
-		foreach ($relns as $reln) {
-			// Get related Individual
-			$memberId = $reln['contact_id_a'];
-dpm('Loop 2 : ' . $memberId);
-			// If related Individual not on the list GoTo next Relationship
-			if (!in_array($memberId, $_contactIds)) { break 2; }
-		}	
-		// (All members are on the list) so add HH to list
-dpm('Adding Household: ' . $hhId);
-		$_contactIds[] = (int)$hhId;
-	}
-dpm($_contactIds);
-
 
 /**
- * Tidy up other items:
+ * Tidy up other items -- for original and added Contacts:
  *   Cancel associated Membership for Households
  *   Delete associated Drupal Users
  */
-	// For each Contact on the list
+//	For each Contact now on the list
 	foreach ($_contactIds as $cid) {
-		// Split on Contact Type
+	// Get Contact Type
 		$cType = \Civi\Api4\Contact::get()
 		->addSelect('contact_type')
 		->addWhere('id', '=', $cid)
 		->execute()
 		->first()['contact_type'];
-		
+dpm($cType);
+
+		// Split on Contact Type
 		if ($cType == 'Household') {
 			// Cancel associated Membership
 			$memId = \Civi\Api4\Membership::get()
@@ -215,28 +215,6 @@ dpm($delResult);
 dpm($result);
   }
 
-  /**
-   *  Cancel Household's Membership.  Flows down to Individuals as usual.
-   */
-	function _cancelHHMembership($hhId) {
-		// Get Membership Id
-		$memId = \Civi\Api4\Membership::get()
-		->addSelect('id')
-		->addWhere('contact_id', '=', $hhId)
-		->execute()
-		->first()['id'];
-	
-		// Cancel Membership
-dpm('Cancelling Membership. Id: ' . $memId);
-		if($memId) {
-			$memResult = \Civi\Api4\Membership::update()
-			->addValue('id', $memId)
-			->addValue('contact_id', $cid)
-			->addValue('status_id', 6)						//Cancelled
-			->addValue('is_override', TRUE)
-			->execute();
-		}
-	}
 
   /**
    * Declare ad-hoc field list for this action.
