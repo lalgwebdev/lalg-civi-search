@@ -48,7 +48,7 @@ class LalgDeleteMembers extends \Civi\Api4\Generic\AbstractAction {
    * @param Result $result
    */
   public function _run(Result $result) {
-dpm($this);
+// dpm($this);
 
 // Construct the array of Contact Ids depending on the parameter(s) given.
     if (isset($this->contactId)) {						// Use the Single Id 
@@ -60,7 +60,7 @@ dpm($this);
 	else {
 	  throw new Exception('No valid Id parameter detected');
 	}
-dpm($_contactIds);
+// dpm($_contactIds);
 
 
 /**
@@ -73,7 +73,7 @@ dpm($_contactIds);
 		->addWhere('id', '=', $cid)
 		->execute()
 		->first()['contact_type'];
-dpm($cType);
+// dpm($cType);
 
 	//Split on Contact Type
 	//  Do HOUSEHOLD tidy ups
@@ -82,20 +82,20 @@ dpm($cType);
   *  For each Household on the list 
   *    add any members not already on it.  
   */
-	dpm('Getting Relationships');		
+// dpm('Getting Relationships');		
 			$relns = \Civi\Api4\Relationship::get()
 				->addSelect('contact_id_a')
 				->addWhere('contact_id_b', '=', $cid)
 				->addWhere('contact_id_a.is_deleted', '=', FALSE)
 				->execute();
-	dpm($relns);		
+// dpm($relns);		
 			// For each Relationship
 			foreach ($relns as $reln) {
 				// Get related Individual
 				$memberId = $reln['contact_id_a'];
 				// If not on the list, then add.
 				if (!in_array($memberId, $_contactIds)) {
-	dpm ('Adding Individual: ' . $memberId);
+// dpm ('Adding Individual: ' . $memberId);
 					$_contactIds[] = (int)$memberId;
 				}
 			}
@@ -121,24 +121,24 @@ dpm($cType);
 				->addSelect('contact_id_a')
 				->addWhere('contact_id_b', '=', $hhId)
 				->execute();		
-	dpm($relns);
+// dpm($relns);
 			
 			$addHH = TRUE;						// Default assumption - add HH to list
 			foreach ($relns as $reln) {
 				// Get related Individual
 				$memberId = $reln['contact_id_a'];
-	dpm('Loop 2 : ' . $memberId);
+// dpm('Loop 2 : ' . $memberId);
 				// If related Individual not on the list GoTo next Relationship
 				if (!in_array($memberId, $_contactIds)) { $addHH = FALSE; break; } // Found reason not to delete the Household 
 			}	
 			if ($addHH) {
 			// (All members are on the list) so add HH to list
-	dpm('Adding Household: ' . $hhId);
+// dpm('Adding Household: ' . $hhId);
 				$_contactIds[] = (int)$hhId;
 			}
 		}
 	}
-dpm($_contactIds);
+// dpm($_contactIds);
 
 
 /**
@@ -154,7 +154,7 @@ dpm($_contactIds);
 		->addWhere('id', '=', $cid)
 		->execute()
 		->first()['contact_type'];
-dpm($cType);
+// dpm($cType);
 
 		// Split on Contact Type
 		if ($cType == 'Household') {
@@ -165,7 +165,7 @@ dpm($cType);
 			->execute()
 			->first()['id'];
 
-dpm('Cancelling Membership. Id: ' . $memId);
+// dpm('Cancelling Membership. Id: ' . $memId);
 			if($memId) {
 				$memResult = \Civi\Api4\Membership::update()
 				->addValue('id', $memId)
@@ -178,23 +178,18 @@ dpm('Cancelling Membership. Id: ' . $memId);
 
 		else {								// Is Individual
 			// Delete Drupal Account
-			try {
-				$userId = \Civi\Api4\UFMatch::get()
-				->addWhere('contact_id', '=', $cid)
-				->execute()
-				->first()['uf_id'];		
-				
+			$userIdResult = \Civi\Api4\UFMatch::get()
+			->addWhere('contact_id', '=', $cid)
+			->execute();
+			if ($userIdResult->first()) {
+				$userId = $userIdResult->first()['uf_id'];		
 				if ($userId) {
 					$user = \Drupal\user\Entity\User::load($userId); // get the User Entity
-dpm('Deleting Drupal User');
+// dpm('Deleting Drupal User');
 					if ($user) {
 						$user->delete();
 					}
 				}
-			}
-			catch (Exception $e) {
-				// Throws error if no User, so ignore it
-				//dpm($e);
 			}
 		}
 	}
@@ -202,17 +197,17 @@ dpm('Deleting Drupal User');
 /**
  *  Finally - Delete all Contacts on the list - to Trash.
  */
-dpm('Deleting Contacts');
+// dpm('Deleting Contacts');
 	$delResult = \Civi\Api4\Contact::delete()
 	->addWhere('id', 'IN', $_contactIds)
 	->execute();
-dpm($delResult);		
+// dpm($delResult);		
 
 	// And return a result.
     $result[] = [
       'deleted' => 'Deleted ' . sizeof($_contactIds) . ' Contacts.',
     ];
-dpm($result);
+// dpm($result);
   }
 
 

@@ -200,13 +200,6 @@ function lalg_civi_search_civicrm_searchTasks($objectName, &$tasks) {
  * @param int|null $userID
  */
 function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
-  // $tasks['Contact']['lalgDelateMembers'] = [
-    // 'module' => 'lalgSearchTasks',
-    // 'title' => E::ts('LALG Delete Members'),
-    // 'icon' => 'fa-random',
-    // 'uiDialog' => ['templateUrl' => '~/lalgSearchTasks/lalgDeleteMembers.html'],
-  // ];
-
 // Registers the Action to Delete/Cancel Members and Memberships.  
 // Specified for use in Search Kit apiBatch facility.
 // The documentation says it is called once per row, but actually is called with an array of Ids.
@@ -216,11 +209,11 @@ function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermi
     'apiBatch' => [
       'action' => 'lalgDeleteMembers', 				// Name of API action to call [once per row]
       'params' => NULL, 							// Optional array of additional api params
-      'confirmMsg' => E::ts('This will delete the selected Contacts to the recycle bin, cancel Memberships, and delete any associated Drupal login account. ...........................................................................................................................................................................
-It will also remove all members of a deleted Household, and any Household where all members are deleted. ...........................................................................................................................................................................
+      'confirmMsg' => E::ts('This will delete the selected Contacts to the recycle bin, cancel Memberships, and delete any associated Drupal login account. ...................................................................................................................................................................................................................................................
+It will also remove all members of a deleted Household, and any Household where all members are deleted. .....................................................................................................................................................................................................................................................................
 Are you sure you want to delete %1 %2?'), // If omitted, the action will run immediately with no confirmation.  Forgive the horrible newline substitute.
       'runMsg' => E::ts('Deleting %1 %2...'),
-      'successMsg' => E::ts('Successfully deleted %1 %2 (plus dependencies).'),
+      'successMsg' => E::ts('Successfully deleted %1 selected %2 (plus empty Households and orphaned Members).'),
       'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
     ],
   ];
