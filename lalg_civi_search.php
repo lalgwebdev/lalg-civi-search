@@ -209,9 +209,7 @@ function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermi
     'apiBatch' => [
       'action' => 'lalgDeleteMembers', 				// Name of API action to call [once per row]
       'params' => NULL, 							// Optional array of additional api params
-      'confirmMsg' => E::ts('This will delete the selected Contacts to the recycle bin, cancel Memberships, and delete any associated Drupal login account. ...................................................................................................................................................................................................................................................
-It will also remove all members of a deleted Household, and any Household where all members are deleted. .....................................................................................................................................................................................................................................................................
-Are you sure you want to delete %1 %2?'), // If omitted, the action will run immediately with no confirmation.  Forgive the horrible newline substitute.
+      'confirmMsg' => E::ts('Are you sure you want to delete %1 %2?  Plus Membership and Drupal Login, etc.'), // If omitted, the action will run immediately with no confirmation.  
       'runMsg' => E::ts('Deleting %1 %2...'),
       'successMsg' => E::ts('Successfully deleted %1 selected %2 (plus empty Households and orphaned Members).'),
       'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
