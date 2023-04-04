@@ -189,6 +189,10 @@ function lalg_civi_search_civicrm_searchTasks($objectName, &$tasks) {
       'title' => 'LALG - Delete Members',
       'class' => 'CRM_Contact_Form_Task_LalgDeleteMembers'
     ];
+    $tasks[] = [
+      'title' => 'LALG - Print Reminders',
+      'class' => 'CRM_Contact_Form_Task_LalgPrintReminders',
+    ];	
   }
 }
 
@@ -200,8 +204,7 @@ function lalg_civi_search_civicrm_searchTasks($objectName, &$tasks) {
  * @param int|null $userID
  */
 function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
-// Registers the Action to Delete/Cancel Members and Memberships.  
-// Specified for use in Search Kit apiBatch facility.
+// Registers Actions for use in Search Kit apiBatch facility.
 // The documentation says it is called once per row, but actually is called with an array of Ids.
   $tasks['Contact']['lalgDeleteMembers'] = [
     'title' => E::ts('LALG Delete Members'),
@@ -222,42 +225,70 @@ function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermi
  * Adds js to our form
  */
 function lalg_civi_search_civicrm_buildForm($formName, &$form) {
+	// Print Membership Cards
 	  if ($formName == "CRM_Contact_Form_Task_LalgPrintCards") {
 		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/printcards.js');
 	  }
-	  if ($formName == "CRM_Contact_Form_Task_LalgPrintLabels") {
-		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/printlabels.js');
-	  }  
-	  if ($formName == "CRM_Contact_Export_Form_LalgSelect") {
-		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/exportCSV.js');
-	  }  
+  
+    // Print/Export Newsletter Labels
 	  if (strpos($_SERVER['REQUEST_URI'], "lalgwf=2" ) !== false) {
 		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/searchlabels.js');
+	  }	 
+	  if ($formName == "CRM_Contact_Form_Task_LalgPrintLabels") {
+		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/printlabels.js');
 	  }	  
-	  if (strpos($_SERVER['REQUEST_URI'], "civicrm/dataprocessor_activity_search/membership_postal_reminders" ) !== false) {
-		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/searchreminders.js');
-	  }	
+	  if ($formName == "CRM_Contact_Export_Form_LalgSelect") {
+		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/exportCSV.js');
+	  }	  
+	  
+	// Print Reminders (OLD)  
+	  // if (strpos($_SERVER['REQUEST_URI'], "civicrm/dataprocessor_activity_search/membership_postal_reminders" ) !== false) {
+		// Civi::resources()->addScriptFile(E::LONG_NAME, 'js/searchreminders.js');
+	  // }	
+	  
+	// Delete Members  
 	  if (strpos($_SERVER['REQUEST_URI'], "civicrm/dataprocessor_contact_search/delete_members" ) !== false) {
 		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/deletemembers.js');
 	  }
+	  
+	// Print Reminders (New)  
+//dpm($_SERVER['REQUEST_URI']);  
+	  if (strpos($_SERVER['REQUEST_URI'], "lalgwf=3" ) !== false) {
+		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/searchreminders.js');
+	  }	  
+//dpm($formName);
+	  if ($formName == "CRM_Contact_Form_Task_LalgPrintReminders") {
+		Civi::resources()->addScriptFile(E::LONG_NAME, 'js/printreminders.js');
+	  }  
 }
 
 
 /************************************************************/
-// Batch Printing Membership Cards
+// Batch Printing Membership Cards etc.
 /************************************************************/
 /**
  * Implements hook_civicrm_postProcess().
  * Clears the printing flag if the upload button
  * (labelled "Download and clear flags") was used
+ * And similarly for Print Reminder Activities
  */
 function lalg_civi_search_civicrm_postProcess($formName, &$form) {
+//dpm($formName);
+//dpm($form);
+// Print Membership Cards custom search
   if ($formName == "CRM_Contact_Form_Task_LalgPrintCards") {
     $buttonName = $form->controller->getButtonName();
     if ($buttonName == '_qf_LalgPrintCards_upload') {
       CRM_LalgCiviSearch::clear_print_flag($form->_contactIds);
     }
   }
+  
+// Print Reminders
+  else if ($formName == "CRM_Contact_Form_Task_LalgPrintReminders") { 
+	$buttonName = $form->controller->getButtonName();
+    if ($buttonName == '_qf_LalgPrintReminders_upload') {  
+      CRM_LalgCiviSearch::clear_activities($form->_contactIds);
+    }
+  }
 }
-
 

@@ -37,4 +37,34 @@ class CRM_LalgCiviSearch {
     }
   }
 
+  /**
+   * This function Sets the Print Reminder Activity from 'Scheduled' to Completed.
+   * @param  mixed $cids Contact IDS - Array or comma seperated integers
+   * Note - these are the ids of people, not the households.
+   */  
+  public static function clear_activities($cids) {
+    if (!is_array($cids)) {
+      $cids = explode(",", $cids);
+    }
+//dpm($cids);	
+	// Get the (list of) relevant Activities
+    foreach ($cids as $cid) {
+		$activities = \Civi\Api4\Activity::get()
+			->addJoin('Contact AS contact', 'LEFT', 'ActivityContact')
+			->addWhere('activity_type_id', '=', 56)	// Print Postal Reminder
+			->addWhere('status_id', '=', 1)			// Scheduled
+			->addWhere('contact.id', '=', $cid)
+			->execute();
+//dpm($activities);	
+		// Set Status of each to Completed		
+		foreach ($activities as $activity) {
+			$results = \Civi\Api4\Activity::update()
+				->addValue('status_id', 2)			// Completed
+				->addWhere('id', '=', $activity['id'])
+				->execute();
+		}
+//dpm($results);
+	}
+  }	
+
 }
