@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/LalgCiviSearch</base>
+  <class>LalgCmsUser</class>
+  <name>lalg_cms_user</name>
+  <comment>View onto Drupal users_field_data Table</comment>
+  <log>true</log>
+
+  <field>
+    <name>uid</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique LalgCmsUser ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+<!--   <primaryKey>
+    <name>uid</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+ -->
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact</comment>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  
+  <field>
+    <name>name</name>
+	<type>text</type>
+	<comment>Login User Name</comment>
+  </field>
+  
+  <field>
+    <name>mail</name>
+	<type>text</type>
+	<comment>Email Address</comment>
+  </field>
+
+  <field>
+    <name>login</name>
+	<type>int unsigned</type>
+	<comment>Timestamp of last login</comment>
+  </field>
+
+  <field>
+    <name>access</name>
+	<type>int unsigned</type>
+	<comment>Timestamp of last Access</comment>
+  </field>
+
+</table>

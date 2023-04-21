@@ -449,5 +449,11 @@ function _lalg_civi_search_civix_civicrm_alterSettingsFolders(&$metaDataFolders 
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _lalg_civi_search_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes = array_merge($entityTypes, [
+    'CRM_LalgCiviSearch_DAO_LalgCmsUser' => [
+      'name' => 'LalgCmsUser',
+      'class' => 'CRM_LalgCiviSearch_DAO_LalgCmsUser',
+      'table' => 'lalg_cms_user',
+    ],
+  ]);
 }

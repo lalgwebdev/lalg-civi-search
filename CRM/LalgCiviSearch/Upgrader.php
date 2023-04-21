@@ -12,9 +12,9 @@ class CRM_LalgCiviSearch_Upgrader extends CRM_LalgCiviSearch_Upgrader_Base {
   /**
    * Example: Run an external SQL script when the module is installed.
    */
-//  public function install() {
-//    $this->executeSqlFile('sql/myinstall.sql');
-//  }
+ public function install() {
+   $this->executeSqlFile('sql/auto_install.sql');
+ }
 
   /**
    * Example: Work with entities usually not available during the install step.
@@ -37,9 +37,9 @@ class CRM_LalgCiviSearch_Upgrader extends CRM_LalgCiviSearch_Upgrader_Base {
   /**
    * Example: Run an external SQL script when the module is uninstalled.
    */
-//  public function uninstall() {
-//   $this->executeSqlFile('sql/myuninstall.sql');
-//  }
+ public function uninstall() {
+  $this->executeSqlFile('sql/auto_uninstall.sql');
+ }
 
   /**
    * Example: Run a simple query when a module is enabled.
@@ -60,13 +60,12 @@ class CRM_LalgCiviSearch_Upgrader extends CRM_LalgCiviSearch_Upgrader_Base {
    *
    * @return TRUE on success
    * @throws Exception
-   *
-  public function upgrade_4200() {
-    $this->ctx->log->info('Applying update 4200');
-    CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
-    CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
+   */
+  public function upgrade_1801() {
+    $this->ctx->log->info('Applying update 1801');
+    $this->executeSqlFile('sql/auto_install.sql');
     return TRUE;
-  } // */
+  } 
 
 
   /**
