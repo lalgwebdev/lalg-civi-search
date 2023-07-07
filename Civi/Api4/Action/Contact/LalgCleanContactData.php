@@ -71,20 +71,20 @@ class LalgCleanContactData extends \Civi\Api4\Generic\AbstractAction {
 	foreach ($_contactIds as $cid) {
 
     // Delete Activities where this Contact is the Target (i.e. not created by)
-	  $activityContacts = \Civi\Api4\ActivityContact::get()
+	  $results = \Civi\Api4\ActivityContact::get()
         ->addSelect('activity_id')
         ->addWhere('contact_id', '=', $cid)
         ->addWhere('record_type_id', '=', 3)
         ->addChain('name_me_0', \Civi\Api4\Activity::delete()
           ->addWhere('id', '=', '$activity_id'), 
-		  0)
+        0)
         ->execute();
 
     // Delete Contributions by this Contact
 	  $results = \Civi\Api4\Contribution::delete()
         ->addWhere('contact_id', '=', $cid)
         ->execute();
-      
+    
 	// Get the Drupal User Id (if any)
       $results = \Civi\Api4\UFMatch::get()
         ->addSelect('uf_id')
@@ -95,6 +95,7 @@ class LalgCleanContactData extends \Civi\Api4\Generic\AbstractAction {
         $userId = $results->first()['uf_id'];		
         if ($userId) {
           $user = \Drupal\user\Entity\User::load($userId); // get the User Entity
+// dpm($userId);
 // dpm("Reassigning Drupal User's Nodes");
           if ($user) {
             \Drupal::database()
@@ -102,6 +103,7 @@ class LalgCleanContactData extends \Civi\Api4\Generic\AbstractAction {
 			  ->condition('uid', $userId)
               ->fields(array('uid' => 0))
               ->execute(); 
+			  
 // dpm('Deleting Drupal User');			  
             $user->delete();
           }
@@ -110,11 +112,12 @@ class LalgCleanContactData extends \Civi\Api4\Generic\AbstractAction {
 	  
 	// Permanently Delete the Contact record
 	// Flows down to associated address, Email, Membership, membership of Groups.
+// dpm('Deleting Contact Record');
 	  $results = \Civi\Api4\Contact::delete()
         ->addWhere('id', '=', $cid)
 		->setUseTrash(FALSE)
         ->execute();
-	  
+// dpm($results);	  
 	}  
 	
 	// And return a result.
