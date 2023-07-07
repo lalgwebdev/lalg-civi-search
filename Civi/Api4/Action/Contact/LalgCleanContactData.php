@@ -42,9 +42,10 @@ class LalgCleanContactData extends \Civi\Api4\Generic\AbstractAction {
    *   Get the Contact Id(s).  Then For Each:
    *     Delete Activities
    *     Delete Contributions
-   *     Delete Contact Record.  Flows down to Address, Email, Membership, Groups
    *     Get the Drupal User Id
-   *     Delete Drupal User.
+   *       Reassign Nodes to Anonymous
+   *       Delete Drupal User.
+   *     Delete Contact Record.  Flows down to Address, Email, Membership, Groups
    *
    * @param $this->where 
    * @param Result $result
@@ -83,30 +84,37 @@ class LalgCleanContactData extends \Civi\Api4\Generic\AbstractAction {
 	  $results = \Civi\Api4\Contribution::delete()
         ->addWhere('contact_id', '=', $cid)
         ->execute();
-
-
-	// Delete the Contact record
-	// Flows down to associated address, Email, Membership, membership of Groups.
-	  $results = \Civi\Api4\Contact::delete()
-        ->addWhere('id', '=', $cid)
-        ->execute();
       
 	// Get the Drupal User Id (if any)
       $results = \Civi\Api4\UFMatch::get()
         ->addSelect('uf_id')
         ->addWhere('contact_id', '=', $cid)
         ->execute();
-	// And delete it
+	// Check and get User Id and User object
       if ($results->first()) {
         $userId = $results->first()['uf_id'];		
         if ($userId) {
           $user = \Drupal\user\Entity\User::load($userId); // get the User Entity
-// dpm('Deleting Drupal User');
+// dpm("Reassigning Drupal User's Nodes");
           if ($user) {
+            \Drupal::database()
+              ->update('node_field_data')
+			  ->condition('uid', $userId)
+              ->fields(array('uid' => 0))
+              ->execute(); 
+// dpm('Deleting Drupal User');			  
             $user->delete();
           }
         }
       }
+	  
+	// Permanently Delete the Contact record
+	// Flows down to associated address, Email, Membership, membership of Groups.
+	  $results = \Civi\Api4\Contact::delete()
+        ->addWhere('id', '=', $cid)
+		->setUseTrash(FALSE)
+        ->execute();
+	  
 	}  
 	
 	// And return a result.
