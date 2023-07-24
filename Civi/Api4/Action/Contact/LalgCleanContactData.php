@@ -1,6 +1,8 @@
 <?php
 namespace Civi\Api4\Action\Contact;
 use Civi\Api4\Generic\Result;
+use \Drupal\node\Entity\Node;
+use \Drupal\user\Entity\User;
 
 /**
  * Custom Action to clean all data related to a Contact.  Includes the Contact record,
@@ -96,17 +98,23 @@ class LalgCleanContactData extends \Civi\Api4\Generic\AbstractAction {
         if ($userId) {
           $user = \Drupal\user\Entity\User::load($userId); // get the User Entity
 // dpm($userId);
-// dpm("Reassigning Drupal User's Nodes");
-          if ($user) {
-            \Drupal::database()
-              ->update('node_field_data')
-			  ->condition('uid', $userId)
-              ->fields(array('uid' => 0))
-              ->execute(); 
-			  
+          if($user) {
+// dpm("Reassigning User's Nodes");
+            $nodes = \Drupal::entityTypeManager()
+	          -> getStorage('node')
+			  -> loadByProperties([
+			       'uid' => $userId,
+			     ]);
+// dpm($nodes);             		  
+            foreach($nodes as $node) {
+	          $node->uid = 0;
+			  $node->save(); 
+// dpm($node);		    
+            } 
+		  
 // dpm('Deleting Drupal User');			  
             $user->delete();
-          }
+          } 
         }
       }
 	  

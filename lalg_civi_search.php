@@ -207,7 +207,7 @@ function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermi
 // Registers Actions for use in Search Kit apiBatch facility.
 // The documentation says it is called once per row, but actually is called with an array of Ids.
   $tasks['Contact']['lalgDeleteMembers'] = [
-    'title' => E::ts('LALG Delete Members'),
+    'title' => E::ts('LALG Delete Members to Trash'),
     'icon' => 'fa-trash',
     'apiBatch' => [
       'action' => 'lalgDeleteMembers', 				// Name of API action to call [once per row]
@@ -218,6 +218,20 @@ function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermi
       'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
     ],
   ];
+  
+  $tasks['Contact']['lalgCleanContactData'] = [
+    'title' => E::ts('LALG Clean All Contact Data'),
+    'icon' => 'fa-trash',
+    'apiBatch' => [
+      'action' => 'lalgCleanContactData', 				// Name of API action to call [once per row]
+      'params' => NULL, 							// Optional array of additional api params
+      'confirmMsg' => E::ts('Are you sure you want to Permanently Delete %1 %2?  Plus Contributions, Membership and Drupal Login, etc.'), // If omitted, the action will run immediately with no confirmation.  
+      'runMsg' => E::ts('Deleting %1 %2...'),
+      'successMsg' => E::ts('Successfully deleted %1 selected %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
+    ],
+  ];
+  
 }
 
 /**
