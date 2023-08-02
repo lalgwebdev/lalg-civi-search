@@ -128,6 +128,10 @@ class LalgCleanContactData extends \Civi\Api4\Generic\AbstractAction {
 // dpm($results);	  
 	}  
 	
+	// Re-sync the LalgCmsUser cached table of users
+	\Civi\Api4\LalgCmsUser::sync()
+      ->execute();
+
 	// And return a result.
     $result[] = [
       'deleted' => 'Deleted ' . sizeof($_contactIds) . ' Contacts.',

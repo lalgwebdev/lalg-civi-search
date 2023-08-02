@@ -232,6 +232,19 @@ function lalg_civi_search_civicrm_searchKitTasks(array &$tasks, bool $checkPermi
     ],
   ];
   
+  $tasks['LalgCmsUser']['lalgCleanUserData'] = [
+    'title' => E::ts('LALG Clean All User Data'),
+    'icon' => 'fa-trash',
+    'apiBatch' => [
+      'action' => 'lalgCleanUserData', 				// Name of API action to call [once per row]
+      'params' => NULL, 							// Optional array of additional api params
+      'confirmMsg' => E::ts('Are you sure you want to Permanently Delete %1 %2?  Plus CiviCRM Contact, Contributions, Membership, etc.'), // If omitted, the action will run immediately with no confirmation.  
+      'runMsg' => E::ts('Deleting %1 %2...'),
+      'successMsg' => E::ts('Successfully deleted %1 selected %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
+    ],
+  ];
+
 }
 
 /**
