@@ -20,8 +20,10 @@ use \Civi\Api4\LalgCommon\LalgCleanCommon;
 class LalgCleanUserData extends \Civi\Api4\Generic\AbstractAction {
 	
   /**
-   * Where clause for further API calls, with Id of the User to be deleted...
+   * Where clause for further API calls, with Id to be deleted...
    *   .. because this is the way that Search Kit apiBatch facility delivers the Id.
+   *   IN FACT this is the Id in the lalg_cms_user table, not the User Id we want
+   *     so will have to look it up.
    *
    * We define this parameter just by declaring this variable. 
    * It will appear in the _API Explorer_, with
@@ -34,7 +36,7 @@ class LalgCleanUserData extends \Civi\Api4\Generic\AbstractAction {
    *
    * @var int
    */
-  protected $userId; 
+  protected $tableId; 
   
   /**
    * Every action must define a _run function to perform the work and place results in the Result object.
@@ -56,11 +58,15 @@ class LalgCleanUserData extends \Civi\Api4\Generic\AbstractAction {
 // dpm($this);
 
 // Construct the array of User Ids depending on the parameter(s) given.
-    if (isset($this->userId)) {						// Use the Single Id 
-	  $_userIds = [$this->userId];
+    $_userIds = [];
+    if (isset($this->tableId)) {					// Use the Single Id 
+	  $_userIds[] = $this->getUserId($this->tableId);
 	}
-	elseif (isset($this->where)) {					// Use the array in the 'where' clause
-	  $_userIds = $this->where[0][2];
+	elseif (isset($this->where)) {					// Get the array in the 'where' clause
+	  $tableIds = $this->where[0][2];
+	  foreach ($tableIds as $id) {
+	    $_userIds[] = $this->getUserId($id);	
+	  }
 	}
 	else {
 	  throw new Exception('No valid Id parameter detected');
@@ -111,4 +117,19 @@ dpm("Cleaning User Id: " . $uid);
       ['name' => 'deleted'],
     ];
   }  
+
+  /**
+   * Get the Drupal User Id from the LalgCmsUser table Id
+   *
+   * @return User Id
+   */
+  function getUserId($tableId) {
+    $userIds = \Civi\Api4\LalgCmsUser::get()
+      ->addSelect('user_id')
+      ->addWhere('id', '=', $tableId)
+      ->execute();    
+		
+    return $userIds->first()['user_id'];
+  }
+
 }
