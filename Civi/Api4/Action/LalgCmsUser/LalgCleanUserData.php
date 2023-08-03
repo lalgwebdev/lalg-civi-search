@@ -71,7 +71,7 @@ class LalgCleanUserData extends \Civi\Api4\Generic\AbstractAction {
 	else {
 	  throw new Exception('No valid Id parameter detected');
 	}
-dpm($_userIds);
+// dpm($_userIds);
 
 /**
   *  Process actions for all Users 
@@ -87,12 +87,12 @@ dpm($_userIds);
  	// Check and get Contact Id, Then clean Contact data
       if ($matches->first()) {
         $cid = $matches->first()['contact_id'];		
-dpm("Cleaning Contact Id: " . $cid);
+// dpm("Cleaning Contact Id: " . $cid);
         LalgCleanCommon::cleanContactData($cid);
 	  }
 
     // And then clean User data
-dpm("Cleaning User Id: " . $uid);
+// dpm("Cleaning User Id: " . $uid);
       LalgCleanCommon::cleanUserData($uid);
     }  
 
